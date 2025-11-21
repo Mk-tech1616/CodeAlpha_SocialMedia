@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="main-content">
+        <!-- Profile Header -->
+        <div class="post" style="text-align: center;">
+            <h2>{{ user_profile.username }}</h2>
+            <p>Bio: {{ user_profile.profile.bio|default:"No bio yet" }}</p>
+            <p>Location: {{ user_profile.profile.location|default:"No location set" }}</p>
+            
+            <div style="display: flex; justify-content: center; gap: 20px; margin: 15px 0;">
+                <div>
+                    <strong>{{ posts.count }}</strong><br>Posts
+                </div>
+                <div>
+                    <strong>{{ followers_count }}</strong><br>Followers
+                </div>
+                <div>
+                    <strong>{{ following_count }}</strong><br>Following
+                </div>
+            </div>
+            
+            {% if user != user_profile %}
+            <button class="follow-btn {% if is_following %}following{% endif %}" 
+                    data-user-id="{{ user_profile.id }}"
+                    style="margin: 10px auto;">
+                {% if is_following %}Following{% else %}Follow{% endif %}
+            </button>
+            {% endif %}
+        </div>
+
+        <!-- User's Posts -->
+        <h3>Posts</h3>
+        {% for post in posts %}
+        <div class="post">
+            <div class="post-header">
+                <span class="post-user">{{ post.user.username }}</span>
+                <span class="post-time">{{ post.created_at|timesince }} ago</span>
+            </div>
+            
+            <div class="post-content">
+                {{ post.content|linebreaks }}
+            </div>
+            
+            <div class="post-actions">
+                <button class="action-btn like-btn {% if request.user in post.likes.all %}liked{% endif %}" data-post-id="{{ post.id }}">
+                    Like (<span class="like-count">{{ post.likes.count }}</span>)
+                </button>
+                <span class="action-btn">{{ post.comments.count }} Comments</span>
+            </div>
+        </div>
+        {% empty %}
+        <div class="post">
+            <p>No posts yet.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
